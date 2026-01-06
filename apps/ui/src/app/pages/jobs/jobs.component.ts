@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { ApiService } from '../../services/api.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-jobs',
@@ -9,6 +10,9 @@ import { HttpClient } from '@angular/common/http';
   template: `
     <div class="jobs-container">
       <h2>Jobs</h2>
+      <div class="api-info">
+        <small>Connected to: {{ apiUrl }}</small>
+      </div>
       <div *ngIf="loading">Loading...</div>
       <div *ngIf="error" class="error">{{ error }}</div>
       <div *ngIf="jobs && jobs.length > 0" class="jobs-list">
@@ -27,7 +31,7 @@ import { HttpClient } from '@angular/common/http';
           </div>
         </div>
       </div>
-      <div *ngIf="jobs && jobs.length === 0" class="empty-state">
+      <div *ngIf="jobs && jobs.length === 0 && !loading" class="empty-state">
         No jobs found
       </div>
     </div>
@@ -89,14 +93,25 @@ import { HttpClient } from '@angular/common/http';
       padding: 2rem;
       color: #666;
     }
+    .api-info {
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      background: #e3f2fd;
+      border-radius: 4px;
+    }
+    .api-info small {
+      color: #1976d2;
+      font-family: monospace;
+    }
   `]
 })
 export class JobsComponent implements OnInit {
   jobs: any[] = [];
   loading = false;
   error: string | null = null;
+  apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private apiService: ApiService) {}
 
   ngOnInit() {
     this.loadJobs();
@@ -105,15 +120,14 @@ export class JobsComponent implements OnInit {
   loadJobs() {
     this.loading = true;
     this.error = null;
-    // Update this URL to match your API endpoint
-    const apiUrl = 'http://localhost:8000/api/v1/jobs/search?q=';
-    this.http.get<any[]>(apiUrl).subscribe({
+    // Search all jobs (empty query returns all)
+    this.apiService.searchJobs('').subscribe({
       next: (data) => {
         this.jobs = data;
         this.loading = false;
       },
       error: (err) => {
-        this.error = 'Failed to load jobs. Make sure the API is running.';
+        this.error = `Failed to load jobs. Make sure the API is running at ${this.apiUrl}`;
         this.loading = false;
         console.error('Error loading jobs:', err);
       }

@@ -1,5 +1,8 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:8000/api/v1'
+  // FastAPI backend API base URL
+  // Backend should be running at http://127.0.0.1:8000
+  // Note: /docs is the Swagger documentation endpoint
+  apiUrl: 'http://127.0.0.1:8000/docs'
 };
 

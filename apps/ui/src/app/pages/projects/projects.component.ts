@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { ApiService } from '../../services/api.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-projects',
@@ -9,6 +10,9 @@ import { HttpClient } from '@angular/common/http';
   template: `
     <div class="projects-container">
       <h2>Projects</h2>
+      <div class="api-info">
+        <small>Connected to: {{ apiUrl }}</small>
+      </div>
       <div *ngIf="loading">Loading...</div>
       <div *ngIf="error" class="error">{{ error }}</div>
       <div *ngIf="projects && projects.length > 0" class="projects-list">
@@ -21,7 +25,7 @@ import { HttpClient } from '@angular/common/http';
           </div>
         </div>
       </div>
-      <div *ngIf="projects && projects.length === 0" class="empty-state">
+      <div *ngIf="projects && projects.length === 0 && !loading" class="empty-state">
         No projects found
       </div>
     </div>
@@ -64,14 +68,25 @@ import { HttpClient } from '@angular/common/http';
       padding: 2rem;
       color: #666;
     }
+    .api-info {
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      background: #e3f2fd;
+      border-radius: 4px;
+    }
+    .api-info small {
+      color: #1976d2;
+      font-family: monospace;
+    }
   `]
 })
 export class ProjectsComponent implements OnInit {
   projects: any[] = [];
   loading = false;
   error: string | null = null;
+  apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private apiService: ApiService) {}
 
   ngOnInit() {
     this.loadProjects();
@@ -80,15 +95,13 @@ export class ProjectsComponent implements OnInit {
   loadProjects() {
     this.loading = true;
     this.error = null;
-    // Update this URL to match your API endpoint
-    const apiUrl = 'http://localhost:8000/api/v1/projects?tenant_id=default';
-    this.http.get<any[]>(apiUrl).subscribe({
+    this.apiService.getProjects('default').subscribe({
       next: (data) => {
         this.projects = data;
         this.loading = false;
       },
       error: (err) => {
-        this.error = 'Failed to load projects. Make sure the API is running.';
+        this.error = `Failed to load projects. Make sure the API is running at ${this.apiUrl}`;
         this.loading = false;
         console.error('Error loading projects:', err);
       }
