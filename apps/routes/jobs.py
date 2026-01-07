@@ -48,12 +48,22 @@ async def list_jobs(
     limit: int = Query(100, ge=1, le=1000, description="Maximum number of records to return")
 ):
     """List jobs with optional filters"""
-    return await JobService.list_jobs(
-        project_id=project_id,
-        status=status,
-        skip=skip,
-        limit=limit
-    )
+    # Try to get jobs - if database is not connected, the service will handle it
+    try:
+        result = await JobService.list_jobs(
+            project_id=project_id,
+            status=status,
+            skip=skip,
+            limit=limit
+        )
+        return result
+    except Exception as e:
+        # Log the error but return empty list to prevent UI crashes
+        import sys
+        import traceback
+        print(f"Error in list_jobs: {type(e).__name__}: {e}", file=sys.stderr)
+        traceback.print_exc()
+        return []
 
 
 @router.put(

@@ -1,0 +1,16 @@
+# RAG and AI Dependencies for Job Matching
+
+# Embedding models and vector database
+sentence-transformers>=2.2.0
+chromadb>=0.4.0
+
+# OpenAI API (optional, for LLM features)
+openai>=1.0.0
+
+# Additional dependencies
+numpy>=1.24.0
+torch>=2.0.0  # Required by sentence-transformers
+
+# PDF Processing
+PyPDF2>=3.0.0
+pdfplumber>=0.9.0

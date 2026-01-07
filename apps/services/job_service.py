@@ -135,17 +135,29 @@ class JobService:
         limit: int = 100
     ) -> List[JobResponse]:
         """List jobs with optional filters"""
-        db = db_manager.get_database()
-        collection = Job.get_collection(db)
-        
-        # Build query
-        query: Dict[str, Any] = {}
-        if project_id:
-            query["project_id"] = project_id
-        if status:
-            query["status"] = status
+        # Ensure database is connected, try to reconnect if needed
+        if not db_manager.is_connected():
+            print("[INFO] Database not connected, attempting to reconnect...")
+            try:
+                db_manager.connect()
+            except Exception as e:
+                print(f"[WARNING] Reconnection attempt failed: {e}")
+            
+            # Verify connection after attempt
+            if not db_manager.is_connected():
+                print("[WARNING] Still not connected after reconnection attempt")
+                print("[INFO] Will try to get database anyway (might work)")
         
         try:
+            db = db_manager.get_database()
+            collection = Job.get_collection(db)
+            
+            # Build query
+            query: Dict[str, Any] = {}
+            if project_id:
+                query["project_id"] = project_id
+            if status:
+                query["status"] = status
             # Get jobs
             job_docs = collection.find(query).skip(skip).limit(limit).sort("created_at", -1)
             
@@ -157,7 +169,12 @@ class JobService:
                 jobs.append(JobService._job_to_response(job, match_count=match_count))
             
             return jobs
+        except RuntimeError as e:
+            # Database connection error
+            print(f"Database connection error in list_jobs: {e}")
+            return []
         except Exception as e:
+            print(f"Error in list_jobs: {e}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Failed to list jobs: {str(e)}"

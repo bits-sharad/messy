@@ -1,0 +1,46 @@
+RAG & GenAI Files to Transfer - Quick Reference
+===============================================
+
+Copy the ENTIRE folder:
+----------------------
+apps/ai/
+
+
+Essential Files Inside apps/ai/:
+--------------------------------
+apps/ai/
+├── __init__.py
+├── services/
+│   ├── __init__.py
+│   ├── rag_service.py                    ⭐ CORE
+│   └── mercer_job_library.py             ⭐ CORE
+├── routes/
+│   ├── __init__.py
+│   └── rag_routes.py                     ⭐ CORE
+├── schemas/
+│   ├── __init__.py
+│   ├── requests.py                       ⭐ CORE
+│   └── responses.py                      ⭐ CORE
+├── libs/
+│   ├── __init__.py
+│   └── dummy_mercer.py                   ⭐ CORE
+└── requirements-rag.txt                  ⭐ CORE
+
+
+Optional Files (if you need PDF processing):
+--------------------------------------------
+apps/services/pdf_service.py
+apps/services/document_service.py
+apps/routes/document_routes.py
+
+
+After Transfer:
+---------------
+1. Install: pip install -r apps/ai/requirements-rag.txt
+2. In your main.py: app.include_router(rag_routes.router)
+3. Set OPENAI_API_KEY in .env (optional)
+4. Done! ✅
+
+
+See TRANSFER_RAG_GENAI_FILES.md for detailed instructions.
+

@@ -48,12 +48,22 @@ async def list_projects(
     limit: int = Query(100, ge=1, le=1000, description="Maximum number of records to return")
 ):
     """List projects with optional filters"""
-    return await ProjectService.list_projects(
-        tenant_id=tenant_id,
-        status=status,
-        skip=skip,
-        limit=limit
-    )
+    # Try to get projects - if database is not connected, the service will handle it
+    try:
+        result = await ProjectService.list_projects(
+            tenant_id=tenant_id,
+            status=status,
+            skip=skip,
+            limit=limit
+        )
+        return result
+    except Exception as e:
+        # Log the error but return empty list to prevent UI crashes
+        import sys
+        import traceback
+        print(f"Error in list_projects: {type(e).__name__}: {e}", file=sys.stderr)
+        traceback.print_exc()
+        return []
 
 
 @router.put(

@@ -1,0 +1,3 @@
+"""AI routes module"""
+
+

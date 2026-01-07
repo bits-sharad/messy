@@ -8,6 +8,7 @@ from apps.models.project import Project
 from apps.schemas.requests import ProjectCreateRequest, ProjectUpdateRequest
 from apps.schemas.responses import ProjectResponse
 from apps.database.connection import db_manager
+from apps.database.connection import db_manager
 
 
 class ProjectService:
@@ -94,17 +95,38 @@ class ProjectService:
         limit: int = 100
     ) -> List[ProjectResponse]:
         """List projects with optional filters"""
-        db = db_manager.get_database()
-        collection = Project.get_collection(db)
-        
-        # Build query
-        query: Dict[str, Any] = {}
-        if tenant_id:
-            query["tenant_id"] = tenant_id
-        if status:
-            query["status"] = status
+        # Ensure database is connected, try to reconnect if needed
+        if not db_manager.is_connected():
+            print("[INFO] Database not connected, attempting to reconnect...")
+            try:
+                db_manager.connect()
+            except Exception as e:
+                print(f"[WARNING] Reconnection attempt failed: {e}")
+            
+            # Verify connection after attempt
+            if not db_manager.is_connected():
+                print("[WARNING] Still not connected after reconnection attempt")
+                print("[INFO] Will try to get database anyway (might work)")
         
         try:
+            # Try to get database - this will raise RuntimeError if not connected
+            try:
+                db = db_manager.get_database()
+            except RuntimeError:
+                # Database not connected, try to reconnect
+                print("[INFO] get_database() failed - attempting reconnect...")
+                db_manager.connect()
+                db = db_manager.get_database()
+            
+            collection = Project.get_collection(db)
+            
+            # Build query
+            query: Dict[str, Any] = {}
+            if tenant_id:
+                query["tenant_id"] = tenant_id
+            if status:
+                query["status"] = status
+            
             # Get projects
             project_docs = collection.find(query).skip(skip).limit(limit).sort("created_at", -1)
             
@@ -119,7 +141,12 @@ class ProjectService:
                 projects.append(ProjectService._project_to_response(project, job_count=job_count))
             
             return projects
+        except RuntimeError as e:
+            # Database connection error
+            print(f"Database connection error in list_projects: {e}")
+            return []
         except Exception as e:
+            print(f"Error in list_projects: {e}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Failed to list projects: {str(e)}"

@@ -1,0 +1,21 @@
+# Copy this file to .env and fill in your values
+# DO NOT commit .env file to git (it's in .gitignore)
+
+# MongoDB Configuration
+# Local MongoDB (default)
+MONGODB_URL=mongodb://localhost:27017/
+MONGODB_DATABASE=job_matching_db
+
+# MongoDB Atlas (Cloud) - Uncomment and fill if using Atlas
+# MONGODB_URL=mongodb+srv://username:password@cluster.mongodb.net/database_name?retryWrites=true&w=majority
+
+# OpenAI API Key (Optional - for RAG LLM features)
+OPENAI_API_KEY=your-openai-api-key-here
+
+# ChromaDB Persistence Directory (Optional)
+CHROMA_PERSIST_DIR=./chroma_db
+
+# Mercer Job Library Configuration (Optional)
+# MERCER_API_KEY=your-mercer-api-key
+# MERCER_API_URL=https://api.mercer.com
+

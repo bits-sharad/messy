@@ -140,12 +140,13 @@ class ProjectService:
             )
     
     # READ
-    async def get_project(self, project_id: str) -> dict:
+    async def get_project(self, project_id: str, include_documents: bool = True) -> dict:
         """
         Get a project by ID
         
         Args:
             project_id: Project ID
+            include_documents: Whether to include document content from PDFs
             
         Returns:
             Dictionary with project data
@@ -178,6 +179,26 @@ class ProjectService:
             job_count = await self._get_job_count(project_id)
             
             response = self._project_to_dict(project_doc, job_count=job_count)
+            
+            # Include document content if requested
+            if include_documents:
+                try:
+                    from apps.services.document_service import DocumentService
+                    from apps.ai.services.rag_service import RAGService
+                    
+                    rag_service = RAGService()
+                    doc_service = DocumentService(rag_service=rag_service)
+                    doc_content = await doc_service.get_documents_for_project(project_id=project_id)
+                    
+                    if doc_content.get("has_documents"):
+                        response["documents"] = doc_content.get("documents_by_job", {})
+                    else:
+                        response["documents"] = {}
+                except Exception as e:
+                    # If document service fails, just continue without document content
+                    print(f"Warning: Could not fetch document content: {e}")
+                    response["documents"] = {}
+            
             return response
             
         except HTTPException:

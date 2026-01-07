@@ -1,0 +1,115 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+logs/
+server.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# MongoDB data (if stored locally)
+data/
+mongodb_data/
+
+# ChromaDB vector database
+chroma_db/
+*.chroma
+
+# Node modules (if any at root)
+node_modules/
+
+# Angular build (handled by apps/ui/.gitignore)
+# apps/ui/dist/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/
+
+# OS files
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# PDF documents (if storing locally)
+job_documents/*.pdf
+documents/*.pdf
+
+# Batch scripts (optional - uncomment if you don't want to commit them)
+# *.bat
+
+# Test files (optional - uncomment if you don't want to commit test scripts)
+# test_*.py
+# check_*.py
+
+# Specific temporary files seen in git status
+nul
+net
+
+# Model files (large ML models)
+*.bin
+*.pth
+*.pt
+*.h5
+*.pb
+
+# Cache directories
+.cache/
+*.cache
+
